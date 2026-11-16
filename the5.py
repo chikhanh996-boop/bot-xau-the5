@@ -8,8 +8,8 @@ import threading
 import os
 
 # ================= CÀI ĐẶT THÔNG SỐ QUỸ THE 5%ERS =================
-TELEGRAM_TOKEN = "7540292886:AAHKY17nK401uS80g8GZ9J4Z83L6N1v99j8"  # Token Phimmaker_notify_bot của Khánh
-TELEGRAM_CHAT_ID = "6467739905"                                  # Chat ID chuẩn của Khánh vừa lấy
+TELEGRAM_TOKEN = "9149052038:AAH_1FS5b06q0VhcsCiQXJnMgeAj3BQ-6I8"  # Token bot khanh_gold_bot mới tạo[cite: 13]
+TELEGRAM_CHAT_ID = "6467739905"                                  # Chat ID Telegram của Khánh[cite: 8]
 
 SYMBOL = "XAUUSD"
 ACCOUNT_SIZE = 2500.0                                          
@@ -172,7 +172,7 @@ def analyze_market():
 def run_bot_loop():
     print("🤖 Bot Tín hiệu Độc Lập XAU/USD trên Cloud đã khởi động...")
     time.sleep(5)
-    send_telegram_message("🚀 **Bot XAU/USD The 5%ers đã lên mây thành công!**\nĐang túc trực canh thị trường 24/7 cho Khánh (Chat ID: 6467739905).")
+    send_telegram_message("🚀 **Bot khanh_gold_bot đã lên mây thành công!**\nĐang túc trực canh thị trường 24/7 cho Khánh.")
     analyze_market()
     
     while True:
