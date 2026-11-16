@@ -5,16 +5,17 @@ import time
 from datetime import datetime, timezone, timedelta
 from flask import Flask
 import threading
+import os
 
 # ================= CÀI ĐẶT THÔNG SỐ QUỸ THE 5%ERS =================
-TELEGRAM_TOKEN = "7123456789:AAHxxxxxx..."      # Thay token của Khánh
-TELEGRAM_CHAT_ID = "123456789"                  # Thay Chat ID của Khánh
+TELEGRAM_TOKEN = "ĐIỀN_TOKEN_BOT_CỦA_KHÁNH_VÀO_ĐÂY"      # Token của Phimmaker_notify_bot
+TELEGRAM_CHAT_ID = "ĐIỀN_CHAT_ID_CỦA_KHÁNH_VÀO_ĐÂY"        # Chat ID Telegram của Khánh
 
 SYMBOL = "XAUUSD"
 ACCOUNT_SIZE = 2500.0                           # Vốn quỹ $2,500
 RISK_USD = 12.5                                 # Rủi ro cố định 0.5% = $12.5
 
-# Khởi tạo Web Server nhỏ để Cloud duy trì hoạt động 24/7
+# Khởi tạo Web Server nhỏ để Render duy trì hoạt động 24/7
 app = Flask(__name__)
 
 @app.route('/')
@@ -22,11 +23,12 @@ def home():
     return "🤖 XAU/USD Trading Bot (The 5%ers) is running 24/7 on Cloud!"
 
 def send_telegram_message(message):
-    """Gửi cảnh báo chi tiết về Telegram"""
+    """Hàm chủ động đẩy tin nhắn thẳng về Telegram của Khánh"""
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
     try:
-        requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=10)
+        print(f"Trạng thái gửi Telegram: {response.status_code}")
     except Exception as e:
         print(f"Lỗi gửi Telegram: {e}")
 
@@ -89,7 +91,7 @@ def get_market_data():
         return None
 
 def calculate_10_indicators(df):
-    """Tính toán 10 chỉ báo uy tín hàng đầu"""
+    """Tính toán các chỉ báo kỹ thuật"""
     df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
     df['ema200'] = df['close'].ewm(span=200, adjust=False).mean()
     
@@ -171,13 +173,18 @@ def analyze_market():
         f"🛡️ *The 5%ers $2,500 - Tự quản lý lệnh tay!*"
     )
     send_telegram_message(msg)
-    print("✅ Đã quét và gửi báo cáo tín hiệu thành công!")
 
 def run_bot_loop():
-    print("🤖 Bot Tín hiệu Độc Lập XAU/USD trên Cloud đã sẵn sàng...")
-    time.sleep(10) # Chờ server khởi động ổn định
+    print("🤖 Bot Tín hiệu Độc Lập XAU/USD trên Cloud đã khởi động...")
+    time.sleep(5)
+    
+    # Bắn tin nhắn chào mừng/kiểm tra kết nối ngay khi vừa chạy lên mây để test
+    send_telegram_message("🚀 **Bot XAU/USD The 5%ers đã lên mây thành công!**\nĐang túc trực canh thị trường 24/7 cho Khánh.")
+    
+    # Quét thị trường lần đầu
     analyze_market()
     
+    # Vòng lặp chạy liên tục mỗi giờ
     while True:
         try:
             now = datetime.now()
@@ -191,12 +198,9 @@ def run_bot_loop():
             time.sleep(60)
 
 if __name__ == "__main__":
-    # Chạy vòng lặp bot ở một luồng riêng biệt (Background Thread)
     bot_thread = threading.Thread(target=run_bot_loop)
     bot_thread.daemon = True
     bot_thread.start()
     
-    # Khởi động Flask Web Server (Render yêu cầu cổng 10000 hoặc biến môi trường PORT)
-    import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
