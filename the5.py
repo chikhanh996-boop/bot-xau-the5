@@ -8,12 +8,12 @@ import threading
 import os
 
 # ================= CÀI ĐẶT THÔNG SỐ QUỸ THE 5%ERS =================
-TELEGRAM_TOKEN = "ĐIỀN_TOKEN_BOT_CỦA_KHÁNH_VÀO_ĐÂY"      # Token của Phimmaker_notify_bot
-TELEGRAM_CHAT_ID = "ĐIỀN_CHAT_ID_CỦA_KHÁNH_VÀO_ĐÂY"        # Chat ID Telegram của Khánh
+TELEGRAM_TOKEN = "7540292886:AAHKY17nK401uS80g8GZ9J4Z83L6N1v99j8"  # Token Phimmaker_notify_bot của Khánh
+TELEGRAM_CHAT_ID = "6467739905"                                  # Chat ID chuẩn của Khánh vừa lấy
 
 SYMBOL = "XAUUSD"
-ACCOUNT_SIZE = 2500.0                           # Vốn quỹ $2,500
-RISK_USD = 12.5                                 # Rủi ro cố định 0.5% = $12.5
+ACCOUNT_SIZE = 2500.0                                          
+RISK_USD = 12.5                                                
 
 # Khởi tạo Web Server nhỏ để Render duy trì hoạt động 24/7
 app = Flask(__name__)
@@ -23,7 +23,6 @@ def home():
     return "🤖 XAU/USD Trading Bot (The 5%ers) is running 24/7 on Cloud!"
 
 def send_telegram_message(message):
-    """Hàm chủ động đẩy tin nhắn thẳng về Telegram của Khánh"""
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
     payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
     try:
@@ -33,7 +32,6 @@ def send_telegram_message(message):
         print(f"Lỗi gửi Telegram: {e}")
 
 def get_high_impact_news():
-    """Kiểm tra lịch kinh tế High Impact (Tin đỏ) trong tuần"""
     try:
         url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
         response = requests.get(url, timeout=10)
@@ -56,7 +54,6 @@ def get_high_impact_news():
         return []
 
 def is_near_news():
-    """Khóa tín hiệu 30 phút trước và sau tin mạnh"""
     events = get_high_impact_news()
     now_utc = datetime.now(timezone.utc)
     for ev in events:
@@ -66,7 +63,6 @@ def is_near_news():
     return False, ""
 
 def get_market_data():
-    """Lấy dữ liệu nến H1 XAU/USD từ nguồn công khai toàn cầu"""
     try:
         url = "https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1h&range=30d"
         headers = {'User-Agent': 'Mozilla/5.0'}
@@ -91,7 +87,6 @@ def get_market_data():
         return None
 
 def calculate_10_indicators(df):
-    """Tính toán các chỉ báo kỹ thuật"""
     df['ema50'] = df['close'].ewm(span=50, adjust=False).mean()
     df['ema200'] = df['close'].ewm(span=200, adjust=False).mean()
     
@@ -177,14 +172,9 @@ def analyze_market():
 def run_bot_loop():
     print("🤖 Bot Tín hiệu Độc Lập XAU/USD trên Cloud đã khởi động...")
     time.sleep(5)
-    
-    # Bắn tin nhắn chào mừng/kiểm tra kết nối ngay khi vừa chạy lên mây để test
-    send_telegram_message("🚀 **Bot XAU/USD The 5%ers đã lên mây thành công!**\nĐang túc trực canh thị trường 24/7 cho Khánh.")
-    
-    # Quét thị trường lần đầu
+    send_telegram_message("🚀 **Bot XAU/USD The 5%ers đã lên mây thành công!**\nĐang túc trực canh thị trường 24/7 cho Khánh (Chat ID: 6467739905).")
     analyze_market()
     
-    # Vòng lặp chạy liên tục mỗi giờ
     while True:
         try:
             now = datetime.now()
